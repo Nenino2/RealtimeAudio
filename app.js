@@ -8,17 +8,12 @@ const MIMETYPE_AUDIO_ONLY = 'video/webm; codecs="opus"';
 const openDom = document.getElementById('open');
 const recordVideoDom = document.getElementById('record_button');
 
-const MIME_TYPE_USE = MIMETYPE_VIDEO_AUDIO;//Change to the correct one once you change
+const MIME_TYPE_USE = MIMETYPE_AUDIO_ONLY;//Change to the correct one once you change
 const STREAM_ID = "remote"//Probably need a dynamic one make sure your video id is the same for the viewer
 
 //Config for camera recorder
 const CAMERA_OPTIONS = {
-  video: {
-    width: 320,
-    height: 280,
-    facingMode: "environment",
-    frameRate: 24
-  }, audio: true
+  video: false, audio: true
 }
 
 
