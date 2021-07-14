@@ -32,6 +32,7 @@ var streamer_config = {
   dbRecord: "gunmeeting",//The root of the streams
   streamId: STREAM_ID,//The user id you wanna stream  
   gun: gunDB,//Gun instance
+  debug: true,
   url: "https://cdn.jsdelivr.net/gh/QVDev/GunStreamer@0.0.9/js/parser_worker.js"
 }
 
