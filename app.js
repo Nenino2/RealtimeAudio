@@ -1,5 +1,6 @@
 const recordDom = document.getElementById('record_button');
 const listenDom = document.getElementById('listen_button');
+const audioDom = document.getElementById('audio');
 const gun = new Gun({ peers: ['https://gunjs-server.herokuapp.com/gun'] });
 const secondInterval = 1;
 
@@ -28,16 +29,14 @@ async function record() {
 
 async function listen() {
   try {
-    const audio = new Audio();
     gun.get('liveaudio').on(async ({base64data}) => {
-      audio.pause();
+      audioDom.pause();
       const receiverBlob = await (await fetch(base64data)).blob();
       const url = URL.createObjectURL(receiverBlob);
       const oldTime = audio.currentTime;
-      audio.src = url;
-      audio.currentTime = oldTime;
+      audioDom.src = url;
+      audioDom.currentTime = oldTime;
       audio.play();
-      console.log(audio);
       index++;
     })
   } catch(error) {
