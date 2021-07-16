@@ -5,7 +5,6 @@ const secondInterval = 3;
 
 async function record() {
   try {
-    alert(navigator)
     const mediaStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
     const mediaRecorder = new MediaRecorder(mediaStream);
     const chunks = []
