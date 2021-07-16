@@ -1,53 +1,33 @@
-import {GunRecorder} from './lib/GunRecorder.js'
-import {GunStreamer} from './lib/GunStreamer.js'
-import {GunViewer} from './lib/GunViewer.js'
+const recordDom = document.getElementById('record_button');
+const remoteDom = document.getElementById('remote')
 
-const MIMETYPE_AUDIO_ONLY = 'video/webm; codecs="opus"';
-const recordVideoDom = document.getElementById('record_button');
-const STREAM_ID = "remote"//Probably need a dynamic one make sure your video id is the same for the viewer
+async function record() {
+  const mediaStream = await navigator.mediaDevices.getUserMedia({  video: false, audio: true });
+  const mediaRecorder = new MediaRecorder(mediaStream, {mimeType:  'video/webm; codecs="opus"'});
+  const chunks = []
+  mediaRecorder.ondataavailable = (event) => {chunks.push(event.data)}
+  mediaRecorder.start(100);
 
-//Configure GunViewer 
-var viewer_config = {
-  mimeType: MIMETYPE_AUDIO_ONLY,
-  streamerId: STREAM_ID,//ID of the streamer
-  catchup: false,//Skip to last frame when there is to much loading. Set to false to increase smooth playback but with latency
-  debug: true,//For debug logs  
+  setTimeout(() => {
+    console.log(chunks);
+    mediaRecorder.stop();
+    const senderBlob = new Blob(chunks, {type: 'video/webm; codecs="opus"'});
+
+
+
+    const reader = new FileReader();
+    reader.readAsDataURL(senderBlob); 
+    reader.onloadend = async () => {
+        const base64data = reader.result;                
+        console.log(base64data); // data you'll save on gundb
+        const receiverBlob = await (await fetch(base64data)).blob();
+        console.log(receiverBlob)
+        const url = URL.createObjectURL(receiverBlob);
+        remoteDom.src = url;
+
+    }
+  }, 5000);
 }
 
-var gunViewer = new GunViewer(viewer_config);
 
-//Configure GUN to pass to streamer
-var peers = ['https://gunmeetingserver.herokuapp.com/gun'];
-var opt = { peers: peers };
-var gunDB = Gun(opt);
-
-// Get data from gun and pass along to viewer
-gunDB.get(STREAM_ID).on(function (data) {
-  gunViewer.onStreamerData(data);
-});
-
-
-//Config for the GUN GunStreamer
-var streamer_config = {
-  dbRecord: "gunmeeting",//The root of the streams
-  streamId: STREAM_ID,//The user id you wanna stream  
-  gun: gunDB,//Gun instance
-  debug: true,
-  url: "https://cdn.jsdelivr.net/gh/QVDev/GunStreamer@0.0.9/js/parser_worker.js"
-}
-
-const gunStreamer = new GunStreamer(streamer_config)
-
-
-var recorder_config = {
-  mimeType: MIMETYPE_AUDIO_ONLY,
-  onDataAvailable: gunStreamer.onDataAvailable,//MediaRecorder data available callback
-  cameraOptions: {  video: false, audio: true },
-}
-
-//Init the recorder
-const gunRecorder = new GunRecorder(recorder_config);
-
-recordVideoDom.addEventListener('click', function() {
-    gunRecorder.record();
-})
+recordDom.addEventListener('click', record)
