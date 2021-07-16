@@ -1,7 +1,7 @@
 const recordDom = document.getElementById('record_button');
 const listenDom = document.getElementById('listen_button');
 const gun = new Gun({ peers: ['https://gunjs-server.herokuapp.com/gun'] });
-const secondInterval = 3;
+const secondInterval = 1;
 
 async function record() {
   try {
